@@ -5,13 +5,83 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>u-til 3D lab - Precificação</title>
     <style>
-        :root {
-            --bg-color: #121212;
-            --container-bg: #1e1e1e;
-            --text-color: #e0e0e0;
-            --accent-color: #ff6b6b;
-            --input-bg: #2d2d2d;
-            --border-color: #404040;
+        :root {/* =========================================
+   VARIÁVEIS DE DESIGN: ÚTIL STUDIO
+   ========================================= */
+:root {
+    --bg-color: #09090b;          /* Preto quase absoluto (Studio Dark) */
+    --card-bg: #18181b;           /* Cinza muito escuro para contraste */
+    --primary-color: #fafafa;     /* Branco puro para ações principais (Minimalismo) */
+    --primary-hover: #e4e4e7;     /* Cinza claro no hover */
+    --text-main: #f4f4f5;         /* Texto claro e legível */
+    --text-muted: #a1a1aa;        /* Texto de apoio (Cinza neutro) */
+    --input-bg: #27272a;          /* Fundo dos campos de digitação */
+    --border-color: #3f3f46;      /* Bordas sutis */
+    --radius: 8px;                /* Bordas um pouco mais retas e modernas */
+    --accent-color: #3b82f6;      /* Um azul técnico para destaques sutis (opcional) */
+}
+
+/* Tipografia mais moderna e geométrica */
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&display=swap');
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Space Grotesk', sans-serif; /* Fonte muito usada em tech/3D */
+}
+
+/* =========================================
+   ESTILOS DO CABEÇALHO E LOGO
+   ========================================= */
+.app-header {
+    text-align: center;
+    margin-bottom: 35px;
+}
+
+.logo-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px; /* Espaço entre o símbolo e o texto */
+    margin-bottom: 10px;
+}
+
+.logo-icon {
+    height: 40px; /* Ajuste o tamanho do símbolo aqui */
+    width: auto;
+}
+
+.logo-text {
+    height: 24px; /* Ajuste o tamanho do ÚTIL STUDIO aqui */
+    width: auto;
+}
+
+.subtitle {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-weight: 500;
+}
+
+/* Atualização do Botão para manter o Minimalismo */
+button {
+    background-color: var(--primary-color);
+    color: #000; /* Texto preto no botão branco */
+    font-weight: 600;
+    border-radius: var(--radius);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+button:hover {
+    background-color: var(--primary-hover);
+}
+
+.value-highlight {
+    color: var(--primary-color); /* Preço final em branco destaque */
+}
         }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
