@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>u-til 3D lab - Precificação</title>
+    <style>
+        :root {
+            --bg-color: #121212;
+            --container-bg: #1e1e1e;
+            --text-color: #e0e0e0;
+            --accent-color: #ff6b6b;
+            --input-bg: #2d2d2d;
+            --border-color: #404040;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+        }
+        .container {
+            background-color: var(--container-bg);
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            max-width: 500px;
+            width: 100%;
+        }
+        h1 {
+            text-align: center;
+            color: var(--accent-color);
+            margin-bottom: 25px;
+            font-size: 1.5rem;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+        }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-top: 15px;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background-color: #ff4c4c;
+        }
+        .resultado-box {
+            margin-top: 25px;
+            padding: 15px;
+            background-color: var(--input-bg);
+            border-radius: 5px;
+            border-left: 4px solid var(--accent-color);
+        }
+        .resultado-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+        .resultado-final {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--accent-color);
+            margin-top: 15px;
+            border-top: 1px solid var(--border-color);
+            padding-top: 15px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Calculadora u-til 3D lab</h1>
+
+    <!-- Variáveis da Máquina e Material -->
+    <div class="form-group">
+        <label>Tempo de Impressão (Horas):</label>
+        <input type="number" id="tempo" step="0.1" value="2.5">
+    </div>
+    <div class="form-group">
+        <label>Peso da Peça (Gramas de PLA):</label>
+        <input type="number" id="peso" value="50">
+    </div>
+    <div class="form-group">
+        <label>Quantidade na Plate (Job):</label>
+        <input type="number" id="qtdJob" value="1">
+    </div>
+
+    <!-- Variáveis de Contexto -->
+    <div class="form-group">
+        <label>Taxa de Falha (%):</label>
+        <select id="taxaFalha">
+            <option value="0.04">4% (Simples/Testada)</option>
+            <option value="0.08">8% (Funcional Média)</option>
+            <option value="0.15">15% (Complexa/Nova)</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label>Nicho / Margem de Venda (%):</label>
+        <select id="margem">
+            <option value="0.40">Utilitários / Simples (40%)</option>
+            <option value="0.70">Board Games / Organizadores (70%)</option>
+            <option value="0.85">Decoração Premium (85%)</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label>Mão de Obra Extra (Acabamento/Suporte) R$:</label>
+        <input type="number" id="maoObraExtra" step="0.5" value="0.00">
+    </div>
+
+    <button onclick="calcular()">Gerar Orçamento</button>
+
+    <!-- Exibição dos Resultados -->
+    <div class="resultado-box" id="resultado" style="display:none;">
+        <div class="resultado-item"><span>Custo Material:</span> <span id="resMaterial">R$ 0,00</span></div>
+        <div class="resultado-item"><span>Custo Energia:</span> <span id="resEnergia">R$ 0,00</span></div>
+        <div class="resultado-item"><span>Custo Depreciação:</span> <span id="resDepreciacao">R$ 0,00</span></div>
+        <div class="resultado-item"><span>Mão de Obra (Diluída):</span> <span id="resMaoObra">R$ 0,00</span></div>
+        <div class="resultado-item"><span>Custo Total Técnico (com falha):</span> <span id="resCustoTecnico">R$ 0,00</span></div>
+        <div class="resultado-item resultado-final"><span>Preço Sugerido (Unidade):</span> <span id="resPreco">R$ 0,00</span></div>
+    </div>
+</div>
+
+<script>
+    function calcular() {
+        // Constantes da Operação u-til 3D lab
+        const custoKg = 120.00; // Preço do kg do PLA
+        const tarifaEnergia = 0.90; // Tarifa Copel aprox em kWh
+        const wattsImpressora = 130; // Consumo médio Bambu A1 em watts
+        const custoImpressora = 3000.00; // Valor da máquina
+        const vidaUtilHoras = 3000; // Vida útil estimada
+        const maoObraFixaJob = 2.00; // Regra de R$2,00 por job
+
+        // Captura de valores do formulário
+        let tempo = parseFloat(document.getElementById('tempo').value);
+        let peso = parseFloat(document.getElementById('peso').value);
+        let qtdJob = parseInt(document.getElementById('qtdJob').value);
+        let taxaFalha = parseFloat(document.getElementById('taxaFalha').value);
+        let margem = parseFloat(document.getElementById('margem').value);
+        let maoObraExtra = parseFloat(document.getElementById('maoObraExtra').value);
+
+        // Cálculos conforme a documentação de mercado
+        let custoMaterial = (peso / 1000) * custoKg; 
+        let custoEnergia = (wattsImpressora / 1000) * tempo * tarifaEnergia;
+        let custoDepreciacao = (custoImpressora / vidaUtilHoras) * tempo;
+        let maoObraDiluida = maoObraFixaJob / qtdJob; 
+        let maoObraTotal = maoObraDiluida + maoObraExtra;
+
+        // Custo total e aplicação de buffer e margem
+        let custoBase = custoMaterial + custoEnergia + custoDepreciacao + maoObraTotal;
+        let custoComFalha = custoBase * (1 + taxaFalha); 
+        let precoSugerido = custoComFalha / (1 - margem); 
+
+        // Atualização da interface
+        document.getElementById('resultado').style.display = 'block';
+        document.getElementById('resMaterial').innerText = `R$ ${custoMaterial.toFixed(2).replace('.', ',')}`;
+        document.getElementById('resEnergia').innerText = `R$ ${custoEnergia.toFixed(2).replace('.', ',')}`;
+        document.getElementById('resDepreciacao').innerText = `R$ ${custoDepreciacao.toFixed(2).replace('.', ',')}`;
+        document.getElementById('resMaoObra').innerText = `R$ ${maoObraTotal.toFixed(2).replace('.', ',')}`;
+        document.getElementById('resCustoTecnico').innerText = `R$ ${custoComFalha.toFixed(2).replace('.', ',')}`;
+        document.getElementById('resPreco').innerText = `R$ ${precoSugerido.toFixed(2).replace('.', ',')}`;
+    }
+</script>
+
+</body>
+</html>
